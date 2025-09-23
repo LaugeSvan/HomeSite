@@ -86,5 +86,8 @@ footer {
     border-top: 2px solid var(--accent-color);
     padding: 10px 0;
     z-index: var(--z-head);
-    font-size: larger;
+    display: flex;
+    justify-content: center; /* center links */
+    align-items: center;
+    font-size: large;
 }
