@@ -1,61 +1,61 @@
 # salsac.at
 
-Velkommen til **salsac.at** – mit personlige kreativt rum, hvor jeg deler projekter, jeg koder på. Her finder du alt fra små eksperimenter til større løsninger, som jeg udvikler i min fritid eller som led i min læringsrejse.
+Welcome to **salsac.at** – my personal creative hub where I share projects I’m coding. Here you’ll find everything from small experiments to bigger solutions I build in my free time or as part of my learning journey.
 
 ---
 
-## 📌 Om salsac.at
+## 📌 About salsac.at
 
-Denne hjemmeside fungerer som et **digitalt portfolio** og **udviklingslog** for mine projekter. Formålet er at:
-- **Dokumentere** min udviklingsproces
-- **Dele** kode, idéer og løsninger
-- **Inspirere** og modtage feedback fra andre udviklere
+This site doubles as a **digital portfolio** and **dev log** for my projects. Its purpose is to:  
+- **Document** my development process  
+- **Share** code, ideas, and solutions  
+- **Inspire** and get feedback from fellow developers  
 
 ---
 
-## 🚀 Projekter
+## 🚀 Projects
 
-| Projekt | Beskrivelse | Teknologier | Status |
+| Project | Description | Technologies | Status |
 |---------|-------------|-------------|--------|
-| [Projekt 1](#) | Kort beskrivelse af projektet og dets formål. | Python, Flask, SQLite | 🟢 Færdig / 🟡 Under udvikling |
-| [Projekt 2](#) | Kort beskrivelse af projektet og dets formål. | JavaScript, React, Node.js | 🟢 Færdig / 🟡 Under udvikling |
+| [Polko](http://polko.svan-nielsen.dk) | A website showcasing various recipes. | PHP, MySQL, JavaScript | 🟡 In progress |
+| [B-O-G](http://bog.svan-nielsen.dk) | Short description of the project and its purpose. | HTML, JavaScript, JSON | 🟢 Complete |
 
-*(Listen opdateres løbende – kig forbi igen!)*
-
----
-
-## 🛠 Teknologier
-
-Jeg arbejder primært med:
-- **Backend:** Python, Node.js, PHP
-- **Frontend:** HTML/CSS, JavaScript, React
-- **Databaser:** SQLite, PostgreSQL, MongoDB
-- **Værktøjer:** Git, Docker, VS Code
+*(List is updated regularly – check back for new projects!)*
 
 ---
 
-## 📂 Struktur
+## 🛠 Technologies
 
-Hvert projekt har sin egen mappe med:
-- **README.md** (beskrivelse, installation, brug)
-- **Kildekode** (organiseret efter funktion)
-- **Dokumentation** (hvis relevant)
-
----
-
-## 💡 Bidrag
-
-Hvis du har idéer, forbedringer eller bare vil sige hej, er du velkommen til at:
-- Åbne et **issue** på [GitHub](#) (hvis relevant)
-- Kontakte mig direkte via [email](#) eller [LinkedIn](#)
+I mainly work with:  
+- **Backend:** JavaScript, Node.js, PHP  
+- **Frontend:** HTML/CSS, JavaScript  
+- **Databases:** MySQL / MariaDB  
+- **Tools:** Git, VS Code  
+- **Hosting:** Hetzner, Simply  
 
 ---
 
-## 📬 Kontakt
+## 📂 Structure
 
-- **Email:** [din@email.com](#)
-- **GitHub:** [@ditbrugernavn](#)
-- **LinkedIn:** [ditnavn](#)
+Each project has its own folder with:  
+- **README.md** (description, setup, usage)  
+- **Source code** (organized by functionality)  
+- **Documentation** (if relevant)  
 
+---
+
+## 💡 Contribute
+
+If you have ideas, improvements, or just want to say hi, feel free to:  
+- Open an **issue** on [GitHub](https://github.com/LaugeSvan/HomeSite) (if relevant)  
+- Contact me directly via [email](mailto:hello@salsac.at)
+
+---
+
+## 📬 Contact
+
+- **Email:** [hello@salsac.at](mailto:hello@salsac.at)  
+- **GitHub:** [@LaugeSvan](https://github.com/LaugeSvan)  
+- **YouTube:** [@SvanFoto](https://youtube.com/@SvanFoto)  
 
 © **SalsaCat** & *VilhelmFox*
