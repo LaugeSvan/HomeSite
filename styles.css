@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital@0;1&display=swap');
+
+/* z-index definitions for layering
+0 for main content
+1 for navbars/headers/footers
+2 for modals/popups/overlays
+use variables --z-main, --z-head, --z-modal */
+
+:root {
+    --bg-color: #1e1e1e;
+    --text-color: #f0f0f0;
+    --accent-color: #90847ef5;
+    --font-family: 'Raleway', sans-serif;
+    --font-weight: 500;
+    --z-main: 0;
+    --z-head: 1;
+    --z-modal: 2;
+}
+
+body {
+    text-align: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight);
+    margin: 40vh auto;
+    padding: 0;
+}
+
+/* center nav links */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding: 10px 0;
+    z-index: var(--z-head);
+    display: flex;
+    justify-content: center; /* center links */
+    align-items: center;
+    font-size: large;
+}
+
+.links {
+    display: flex;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;        /* horizontal list */
+    gap: 20px;            /* spacing between items */
+    padding: 20px;
+    margin: 0;
+}
+
+.nav-links li {
+    display: inline-block;
+    min-width: 80px; /* ensure clickable area */
+}
+
+.nav-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: var(--font-weight);
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-links a:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border-radius: 4px;
+}
+
+main img {
+    height: 10vh;
+    margin-bottom: 10px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--bg-color);
+    border-top: 2px solid var(--accent-color);
+    padding: 10px 0;
+    z-index: var(--z-head);
+    font-size: larger;
+}
