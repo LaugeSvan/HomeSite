@@ -18,7 +18,7 @@ This site doubles as a **digital portfolio** and **dev log** for my projects. It
 | Project | Description | Technologies | Status |
 |---------|-------------|-------------|--------|
 | [Polko](http://polko.svan-nielsen.dk) | A website showcasing various recipes. | PHP, MySQL, JavaScript | 🟡 In progress |
-| [B-O-G](http://bog.svan-nielsen.dk) | Short description of the project and its purpose. | HTML, JavaScript, JSON | 🟢 Complete |
+| [B-O-G](http://bog.svan-nielsen.dk) | Online free education platform. | HTML, JavaScript, JSON | 🟢 Complete |
 
 *(List is updated regularly – check back for new projects!)*
 
