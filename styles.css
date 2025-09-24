@@ -23,7 +23,10 @@ body {
     align-items: center;     /* vertical center */
     min-height: 100vh;       /* full viewport height */
     margin: 0;               /* remove previous margin */
-    background-color: var(--bg-color);
+    background-image: url('./assets/bg.gif');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text-color);
     font-family: var(--font-family);
     font-weight: var(--font-weight);
