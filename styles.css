@@ -94,6 +94,13 @@ nav {
     height: 50vh;
     overflow: auto; /* enable scrolling if content overflows */
     margin: 0 auto; /* center and add bottom margin */
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar for WebKit-based browsers (Chrome, Safari, Edge) */
+.intro::-webkit-scrollbar {
+    display: none;
 }
 
 .intro a {
