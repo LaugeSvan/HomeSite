@@ -58,4 +58,4 @@ If you have ideas, improvements, or just want to say hi, feel free to:
 - **GitHub:** [@LaugeSvan](https://github.com/LaugeSvan)  
 - **YouTube:** [@SvanFoto](https://youtube.com/@SvanFoto)  
 
-© **SalsaCat** & *VilhelmFox*
+© **VilhelmFox** & *SalsaCat*
