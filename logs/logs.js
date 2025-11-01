@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://api.github.com/repos/LaugeSvan/HomeSite/commits')
+    fetch('https://api.github.com/repos/vilhelmfox/vfox/commits')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to fetch commits from GitHub API');
