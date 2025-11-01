@@ -1,10 +1,10 @@
-# salsac.at
+# vilhelmfox.dev
 
-Welcome to **salsac.at** – my personal creative hub where I share projects I’m coding. Here you’ll find everything from small experiments to bigger solutions I build in my free time or as part of my learning journey.
+Welcome to **vilhelmfox.dev** – my personal creative hub where I share projects I’m coding. Here you’ll find everything from small experiments to bigger solutions I build in my free time or as part of my learning journey.
 
 ---
 
-## 📌 About salsac.at
+## 📌 About vilhelmfox.dev
 
 This site doubles as a **digital portfolio** and **dev log** for my projects. Its purpose is to:  
 - **Document** my development process  
@@ -17,8 +17,7 @@ This site doubles as a **digital portfolio** and **dev log** for my projects. It
 
 | Project | Description | Technologies | Status |
 |---------|-------------|-------------|--------|
-| [Polko](http://polko.salsac.at) | A website showcasing various recipes. | PHP, MySQL, JavaScript | 🟡 In progress |
-| [B-O-G](http://bog.salsac.at) | Online free education platform. | HTML, JavaScript, JSON | 🟢 Complete |
+| Projects | Are | Coming | Up |
 
 *(List is updated regularly – check back for new projects!)*
 
@@ -27,11 +26,7 @@ This site doubles as a **digital portfolio** and **dev log** for my projects. It
 ## 🛠 Technologies
 
 I mainly work with:  
-- **Backend:** JavaScript, Node.js, PHP  
-- **Frontend:** HTML/CSS, JavaScript  
-- **Databases:** MySQL / MariaDB  
-- **Tools:** Git, VS Code  
-- **Hosting:** Hetzner, Simply  
+- **Nothing**: yet, sorry!
 
 ---
 
@@ -47,15 +42,12 @@ Each project has its own folder with:
 ## 💡 Contribute
 
 If you have ideas, improvements, or just want to say hi, feel free to:  
-- Open an **issue** on [GitHub](https://github.com/LaugeSvan/HomeSite) (if relevant)  
-- Contact me directly via [email](mailto:hello@salsac.at)
+- Open an **issue** on [GitHub](https://github.com/vilhelmfox/vfox) (if relevant)
 
 ---
 
 ## 📬 Contact
 
-- **Email:** [hello@salsac.at](mailto:hello@salsac.at)  
-- **GitHub:** [@LaugeSvan](https://github.com/LaugeSvan)  
-- **YouTube:** [@SvanFoto](https://youtube.com/@SvanFoto)  
+- **GitHub:** [@vilhelmfox](https://github.com/vilhelmfox)
 
 © **VilhelmFox** & *SalsaCat*
