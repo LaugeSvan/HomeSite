@@ -5,27 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SalsaCat - A frontend dev">
     <title>Home - SalsaC.at</title>
+
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <meta property="og:title" content="SalsaCat">
+    <meta property="og:description" content="A small and sharp personal site that does what it wants.">
+    <meta property="og:image" content="https://salsac.at/assets/logo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:url" content="https://salsac.at">
+    <meta property="og:site_name" content="SalsaCat">
+
+    <meta name="twitter:card" content="summary_large_image">
 </head>
+
 <body>
     <nav>
         <div class="nav-container">
             <div class="links">
-            <ul class="nav-links">
-                <li><a href="./">Home</a></li>
-                <li><a href="./about/">About</a></li>
-                <li><a href="./logs/">Logs</a></li>
-                <li><a href="./projects/">Projects</a></li>
-            </ul>
+                <ul class="nav-links">
+                    <li><a href="./">Home</a></li>
+                    <li><a href="./about/">About</a></li>
+                    <li><a href="./logs/">Logs</a></li>
+                    <li><a href="./projects/">Projects</a></li>
+                </ul>
+            </div>
         </div>
-    </div>
     </nav>
+
     <main>
         <div class="intro">
             <img src="/assets/logo.png" alt="Logo">
             <h1 style="margin-bottom: 0;">SalsaCat</h1>
             <h6 style="margin-top: 0;"><em>you can scroll here</em></h6>
+
             <ul class="info-list">
                 <li><strong>Frontend Developer</strong></li>
                 <li><strong>Amateur Videographer</strong></li>
@@ -39,15 +54,20 @@
             </ul>
         </div>
     </main>
+
     <footer>
         <div class="nav-container">
             <div class="links">
                 <ul class="nav-links">
-                    <li>&copy; By SalsaCat with help from VilhelmFox 2025-<span id="copyright"><script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script></span></li>
+                    <li>&copy; By SalsaCat with help from VilhelmFox 2025 <span id="copyright"><script>
+                        document.getElementById('copyright')
+                            .appendChild(document.createTextNode(new Date().getFullYear()));
+                    </script></span></li>
                 </ul>
             </div>
         </div>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
