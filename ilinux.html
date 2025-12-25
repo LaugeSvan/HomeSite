@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iLinux Matrix - Badge Generator</title>
+    <style>
+        :root { --primary: #007bff; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 2rem; background: var(--bg); color: #333; line-height: 1.5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; color: #222; text-align: center; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        label { font-weight: bold; font-size: 0.9rem; margin-bottom: 0.2rem; display: block; }
+        select, input { padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        #preview-section { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; }
+        .result-box { background: #2d2d2d; color: #61dafb; padding: 1rem; border-radius: 4px; position: relative; overflow-x: auto; margin-top: 0.5rem; }
+        code { font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; word-break: break-all; }
+        .badge-display { display: flex; align-items: center; justify-content: center; min-height: 80px; background: #f0f0f0; border: 2px dashed #ccc; border-radius: 4px; margin-bottom: 1rem; }
+        .hint { font-size: 0.8rem; color: #666; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        iLinux Matrix Badge Tool
+        <img src="https://github.com/LaugeSvan/iLinux/raw/main/icon.svg" alt="iLinux Logo" style="width:200px; display:block; margin:1rem auto;">
+    </h1>
+    
+    <div class="grid">
+        <div>
+            <label for="category">Matrix Category:</label>
+            <select id="category">
+                <option value="custom">Custom Badge</option>
+                <option value="status">Status Badge (Experimental/Alpha)</option>
+                <option value="desktop">Desktop Environment (GNOME/KDE)</option>
+                <option value="distro">Distribution (Ubuntu/Debian)</option>
+                <option value="component">Component (GTK/Icons/Dock)</option>
+            </select>
+        </div>
+        <div>
+            <label for="badgeStyle">Style:</label>
+            <select id="badgeStyle" class="live-update">
+                <option value="flat">Flat (Standard)</option>
+                <option value="flat-square">Flat Square</option>
+                <option value="for-the-badge">For The Badge (Large)</option>
+                <option value="plastic">Plastic</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <label for="badgeLabel">Label (Left):</label>
+            <input type="text" id="badgeLabel" class="live-update" placeholder="e.g., GNOME">
+        </div>
+        <div>
+            <label for="badgeValue">Value (Right):</label>
+            <input type="text" id="badgeValue" class="live-update" placeholder="e.g., supported">
+        </div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <label for="badgeColor">Color:</label>
+            <select id="badgeColor" class="live-update">
+                <option value="brightgreen">Bright Green (Working)</option>
+                <option value="green">Green</option>
+                <option value="yellow">Yellow (Partial/Issues)</option>
+                <option value="orange">Orange (Alpha/Maturity)</option>
+                <option value="red">Red (Broken/Unstable)</option>
+                <option value="blue">Blue (Info/Sudo)</option>
+                <option value="lightgrey">Light Grey (Untested)</option>
+            </select>
+        </div>
+        <div>
+            <label for="badgeLogo">Logo (SimpleIcon name):</label>
+            <input type="text" id="badgeLogo" class="live-update" placeholder="e.g., ubuntu, gnome, linux">
+            <div class="hint">Case-sensitive slug (e.g. 'linux-mint')</div>
+        </div>
+    </div>
+
+    <div id="preview-section">
+        <label>Live Preview:</label>
+        <div class="badge-display">
+            <img id="badgeImg" src="" alt="Live Preview">
+        </div>
+        
+        <label>Markdown Code:</label>
+        <div class="result-box">
+            <code id="badgeMarkdown"></code>
+        </div>
+    </div>
+</div>
+
+<script>
+    const badgeLabel = document.getElementById('badgeLabel');
+    const badgeValue = document.getElementById('badgeValue');
+    const badgeColor = document.getElementById('badgeColor');
+    const badgeStyle = document.getElementById('badgeStyle');
+    const badgeLogo = document.getElementById('badgeLogo');
+    const badgeImg = document.getElementById('badgeImg');
+    const badgeMarkdown = document.getElementById('badgeMarkdown');
+    const categorySelect = document.getElementById('category');
+
+    const presets = {
+        status: { label: "status", value: "experimental", color: "red", logo: "" },
+        desktop: { label: "GNOME", value: "supported", color: "brightgreen", logo: "gnome" },
+        distro: { label: "Ubuntu", value: "24.04", color: "blue", logo: "ubuntu" },
+        component: { label: "GTK Themes", value: "working", color: "brightgreen", logo: "" }
+    };
+
+    function updateBadge() {
+        // Shields.io formatting: Replace space with _, dash with --
+        const format = (str) => {
+            return encodeURIComponent(str.trim().replace(/-/g, '--').replace(/\s+/g, '_'));
+        };
+
+        const label = format(badgeLabel.value) || "iLinux";
+        const value = format(badgeValue.value) || "The best!";
+        const color = badgeColor.value;
+        const style = badgeStyle.value;
+        const logo = badgeLogo.value.trim();
+
+        let url = `https://img.shields.io/badge/${label}-${value}-${color}?style=${style}`;
+        if (logo) url += `&logo=${encodeURIComponent(logo)}&logoColor=white`;
+
+        badgeImg.src = url;
+        badgeMarkdown.textContent = `![${badgeLabel.value || 'Badge'}](${url})`;
+    }
+
+    // Preset Listener
+    categorySelect.addEventListener('change', () => {
+        const cat = categorySelect.value;
+        if (presets[cat]) {
+            badgeLabel.value = presets[cat].label;
+            badgeValue.value = presets[cat].value;
+            badgeColor.value = presets[cat].color;
+            badgeLogo.value = presets[cat].logo;
+            updateBadge();
+        }
+    });
+
+    // Live Update Listener for all inputs
+    document.querySelectorAll('.live-update').forEach(el => {
+        el.addEventListener('input', updateBadge);
+    });
+
+    // Initialize on load
+    updateBadge();
+</script>
+
+</body>
+</html>
