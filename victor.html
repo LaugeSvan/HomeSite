@@ -2,35 +2,18 @@
 <html lang="da">
 <head>
     <meta charset="UTF-8">
-    <title>Hop over trekanterne!</title>
+    <title>Evolution: Speed Reset & Hitboxes!</title>
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-        canvas {
-            background-color: #ffffff;
-            border: 2px solid #333;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        }
-        .instruktioner {
-            position: absolute;
-            top: 20px;
-            text-align: center;
-        }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #2c3e50; font-family: sans-serif; overflow: hidden; color: white; }
+        canvas { background-color: #ecf0f1; border: 4px solid #34495e; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .ui { position: absolute; top: 20px; text-align: center; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="instruktioner">
-        <h1>Hop over trekanterne!</h1>
-        <p>Tryk på <strong>Mellemrum</strong> for at hoppe.</p>
+    <div class="ui">
+        <h1 id="status">Hop over trekanterne!</h1>
+        <p id="instruction">Mellemrum: Hop | <strong style="color: #e74c3c;">C</strong>: Pause</p>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -38,152 +21,257 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const statusText = document.getElementById("status");
 
-        // Indstillinger for spillet
         canvas.width = 800;
         canvas.height = 400;
 
-        let score = 0;
-        let gameActive = true;
+        // --- KONFIGURATION ---
+        const HITBOX_BUFFER = 12; // Gør hitboxes mindre (lettere spil)
+        const DEBUG_MODE = true;  // Vis de røde hitboxes
 
-        // Spiller (Firkanten)
+        // Spil variabler
+        let score = 0;
+        let scoreOffset = 0; // <--- NY: Bruges til at resette farten
+        let gameActive = true;
+        let isPaused = false;
+        let gameMode = 'normal'; 
+        let obstacles = [];
+        let obstacleTimer = 0;
+        let isInvincible = false;
+        let graceTimer = 0;
+        let nukeActive = false;
+        let nuke = { x: 0, y: -100, size: 60, speed: 6 };
+        let shakeIntensity = 0;
+        let flashOpacity = 0;
+
         const player = {
-            x: 50,
-            y: 350,
-            size: 40,
-            color: "#3498db",
-            dy: 0,
-            jumpForce: 12,
-            gravity: 0.6,
-            grounded: false
+            x: 100, y: 350, size: 30, color: "#3498db",
+            dy: 0, gravity: 0.6, jumpForce: 12, flapForce: 7, grounded: false
         };
 
-        // Forhindringer (Trekanterne)
-        const obstacles = [];
-        let obstacleTimer = 0;
-
-        // Lyt efter tastetryk
         window.addEventListener("keydown", (e) => {
+            if (e.code === "KeyC") { isPaused = !isPaused; return; }
+            if (isPaused) return;
             if (e.code === "Space") {
-                if (player.grounded && gameActive) {
-                    player.dy = -player.jumpForce;
-                    player.grounded = false;
-                }
-                // Start spillet igen hvis man er tabt
-                if (!gameActive) {
-                    resetGame();
-                }
+                if (!gameActive) { resetGame(); return; }
+                if (gameMode === 'normal') {
+                    if (player.grounded) { player.dy = -player.jumpForce; player.grounded = false; }
+                } else { player.dy = -player.flapForce; }
             }
         });
 
         function spawnObstacle() {
-            const size = 40;
-            obstacles.push({
-                x: canvas.width,
-                y: canvas.height - size,
-                width: size,
-                height: size,
-                speed: 5 + (score / 5) // Spillet bliver hurtigere over tid
-            });
+            // Vi beregner farten baseret på (score - scoreOffset)
+            // Det betyder at farten starter forfra, når vi skifter mode!
+            const relativeScore = score - scoreOffset;
+
+            if (gameMode === 'normal') {
+                const size = 40;
+                obstacles.push({ 
+                    type: 'triangle', 
+                    x: canvas.width, 
+                    y: canvas.height - size, 
+                    width: size, 
+                    height: size, 
+                    speed: 5 + (relativeScore / 10) 
+                });
+            } else {
+                const gap = 140;
+                const pipeWidth = 60;
+                const minPipeHeight = 50;
+                const topHeight = Math.random() * (canvas.height - gap - (minPipeHeight * 2)) + minPipeHeight;
+                obstacles.push({ 
+                    type: 'pipe', 
+                    x: canvas.width, 
+                    width: pipeWidth, 
+                    topHeight: topHeight, 
+                    gap: gap, 
+                    speed: 4 + (relativeScore / 15) 
+                });
+            }
+        }
+
+        function checkEvolution() {
+            if (score >= 75 && gameMode === 'normal') {
+                gameMode = 'flappy';
+                scoreOffset = score; // <--- NY: Vi gemmer scoren her, så farten starter fra 0 i næste beregning
+                obstacles = [];
+                player.gravity = 0.4;
+                player.y = 200;
+                isInvincible = true;
+                graceTimer = 300; 
+                statusText.innerText = "FLAPPY MODE! (FART RESETTER)";
+                statusText.style.color = "#f1c40f";
+            }
+            if (score >= 150 && !nukeActive) {
+                nukeActive = true;
+                nuke.x = player.x; 
+                statusText.innerText = "!!! NUKE DETECTED !!!";
+                statusText.style.color = "#c0392b";
+            }
         }
 
         function resetGame() {
-            score = 0;
-            obstacles.length = 0;
-            player.y = 350;
+            score = 0; 
+            scoreOffset = 0; // <--- NY: Reset offset
+            obstacles = []; 
+            obstacleTimer = 0; 
+            player.y = 350; 
             player.dy = 0;
-            gameActive = true;
+            player.gravity = 0.6; 
+            gameMode = 'normal'; 
+            gameActive = true; 
+            isPaused = false;
+            nukeActive = false; 
+            isInvincible = false; 
+            graceTimer = 0; 
+            shakeIntensity = 0; 
+            flashOpacity = 0;
+            statusText.innerText = "Hop over trekanterne!"; 
+            statusText.style.color = "white";
             animate();
         }
 
-        function drawPlayer() {
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.size, player.size);
-        }
-
-        function drawObstacles() {
-            ctx.fillStyle = "#e74c3c";
-            obstacles.forEach(obs => {
-                ctx.beginPath();
-                ctx.moveTo(obs.x, obs.y + obs.height); // Nederste venstre
-                ctx.lineTo(obs.x + obs.width / 2, obs.y); // Top midt
-                ctx.lineTo(obs.x + obs.width, obs.y + obs.height); // Nederste højre
-                ctx.fill();
-            });
-        }
-
         function update() {
-            if (!gameActive) return;
+            if (!gameActive || isPaused) return;
+            checkEvolution();
 
-            // Tyngdekraft og bevægelse
+            if (isInvincible) {
+                graceTimer--;
+                if (graceTimer <= 0) isInvincible = false;
+            }
+
+            if (nukeActive) {
+                nuke.y += nuke.speed;
+                if (nuke.y + nuke.size - HITBOX_BUFFER > player.y + HITBOX_BUFFER && 
+                    nuke.x + nuke.size - HITBOX_BUFFER > player.x + HITBOX_BUFFER && 
+                    nuke.x + HITBOX_BUFFER < player.x + player.size - HITBOX_BUFFER) {
+                    gameActive = false; flashOpacity = 1.0; shakeIntensity = 30; 
+                }
+            }
+
             player.dy += player.gravity;
             player.y += player.dy;
 
-            // Kollision med gulvet
-            if (player.y + player.size > canvas.height) {
-                player.y = canvas.height - player.size;
-                player.dy = 0;
-                player.grounded = true;
+            if (gameMode === 'normal') {
+                if (player.y + player.size > canvas.height) {
+                    player.y = canvas.height - player.size; player.dy = 0; player.grounded = true;
+                } else { player.grounded = false; }
+            } else {
+                if (player.y < 0 || player.y + player.size > canvas.height) {
+                    if (!isInvincible) gameActive = false;
+                    else {
+                        if (player.y < 0) player.y = 0;
+                        if (player.y + player.size > canvas.height) player.y = canvas.height - player.size;
+                    }
+                }
             }
 
-            // Håndtering af forhindringer
             obstacleTimer++;
-            if (obstacleTimer > Math.max(60, 100 - score)) { 
-                spawnObstacle();
-                obstacleTimer = 0;
-            }
+            let spawnRate = gameMode === 'normal' ? 80 : 60;
+            if (obstacleTimer > Math.max(30, spawnRate - (score/5))) { spawnObstacle(); obstacleTimer = 0; }
 
             for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= obstacles[i].speed;
+                let obs = obstacles[i];
+                obs.x -= obs.speed;
 
-                // Tjek for kollision (simpel firkant-kollision til trekanten)
-                if (
-                    player.x < obstacles[i].x + obstacles[i].width &&
-                    player.x + player.size > obstacles[i].x &&
-                    player.y < obstacles[i].y + obstacles[i].height &&
-                    player.y + player.size > obstacles[i].y
-                ) {
-                    gameActive = false;
+                if (!isInvincible) {
+                    if (gameMode === 'normal') {
+                        if (player.x + HITBOX_BUFFER < obs.x + obs.width - HITBOX_BUFFER &&
+                            player.x + player.size - HITBOX_BUFFER > obs.x + HITBOX_BUFFER &&
+                            player.y + HITBOX_BUFFER < obs.y + obs.height - HITBOX_BUFFER &&
+                            player.y + player.size - HITBOX_BUFFER > obs.y + HITBOX_BUFFER) {
+                            gameActive = false;
+                        }
+                    } else {
+                        if (player.x + player.size - HITBOX_BUFFER > obs.x + HITBOX_BUFFER && 
+                            player.x + HITBOX_BUFFER < obs.x + obs.width - HITBOX_BUFFER) {
+                            if (player.y + HITBOX_BUFFER < obs.topHeight - HITBOX_BUFFER || 
+                                player.y + player.size - HITBOX_BUFFER > obs.topHeight + obs.gap + HITBOX_BUFFER) {
+                                gameActive = false;
+                            }
+                        }
+                    }
                 }
 
-                // Fjern forhindringer der er gået ud af skærmen og giv point
-                if (obstacles[i].x + obstacles[i].width < 0) {
-                    obstacles.splice(i, 1);
-                    score++;
-                }
+                if (obs.x + (obs.width || 40) < 0) { obstacles.splice(i, 1); score++; }
             }
+
+            if (shakeIntensity > 0) shakeIntensity *= 0.9;
+            if (flashOpacity > 0) flashOpacity *= 0.8;
         }
 
-        function drawScore() {
-            ctx.fillStyle = "#333";
-            ctx.font = "24px Arial";
-            ctx.fillText("Score: " + score, 20, 40);
+        function draw() {
+            ctx.save();
+            if (shakeIntensity > 0.5) ctx.translate(Math.random() * shakeIntensity - shakeIntensity/2, Math.random() * shakeIntensity - shakeIntensity/2);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (isInvincible) {
+                ctx.fillStyle = "#f1c40f"; ctx.shadowBlur = 20; ctx.shadowColor = "#f1c40f";
+            } else {
+                ctx.fillStyle = player.color; ctx.shadowBlur = 0;
+            }
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+            ctx.shadowBlur = 0;
+
+            obstacles.forEach(obs => {
+                if (obs.type === 'triangle') {
+                    ctx.fillStyle = "#e74c3c";
+                    ctx.beginPath();
+                    ctx.moveTo(obs.x, obs.y + obs.height);
+                    ctx.lineTo(obs.x + obs.width / 2, obs.y);
+                    ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = "#2ecc71";
+                    ctx.fillRect(obs.x, 0, obs.width, obs.topHeight);
+                    ctx.fillRect(obs.x, obs.topHeight + obs.gap, obs.width, canvas.height);
+                }
+            });
+
+            if (nukeActive) { ctx.font = "60px Arial"; ctx.fillText("☢️", nuke.x, nuke.y + nuke.size); }
+
+            if (DEBUG_MODE) {
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(player.x + HITBOX_BUFFER, player.y + HITBOX_BUFFER, player.size - (HITBOX_BUFFER * 2), player.size - (HITBOX_BUFFER * 2));
+                obstacles.forEach(obs => {
+                    if (obs.type === 'triangle') {
+                        ctx.strokeRect(obs.x + HITBOX_BUFFER, obs.y + HITBOX_BUFFER, obs.width - (HITBOX_BUFFER * 2), obs.height - (HITBOX_BUFFER * 2));
+                    } else {
+                        ctx.strokeRect(obs.x + HITBOX_BUFFER, 0, obs.width - (HITBOX_BUFFER * 2), obs.topHeight - HITBOX_BUFFER);
+                        ctx.strokeRect(obs.x + HITBOX_BUFFER, obs.topHeight + obs.gap + HITBOX_BUFFER, obs.width - (HITBOX_BUFFER * 2), canvas.height);
+                    }
+                });
+            }
+
+            ctx.fillStyle = "#34495e"; ctx.font = "bold 24px Arial"; ctx.fillText("Score: " + score, 20, 40);
+            if (isPaused) {
+                ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white"; ctx.font = "bold 50px Arial"; ctx.textAlign = "center"; ctx.fillText("PAUSE", canvas.width / 2, canvas.height / 2); ctx.textAlign = "start";
+            }
+            if (flashOpacity > 0) { ctx.fillStyle = `rgba(255, 255, 255, ${flashOpacity})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+            ctx.restore();
         }
 
         function animate() {
             if (!gameActive) {
-                ctx.fillStyle = "rgba(0,0,0,0.5)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "white";
-                ctx.font = "40px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-                ctx.font = "20px Arial";
-                ctx.fillText("Tryk Mellemrum for at prøve igen", canvas.width / 2, canvas.height / 2 + 40);
-                ctx.textAlign = "start";
-                return;
+                if (flashOpacity > 0.1) { draw(); setTimeout(() => {
+                    ctx.fillStyle = "rgba(0,0,0,0.8)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "white"; ctx.font = "bold 40px Arial"; ctx.textAlign = "center";
+                    if (score >= 150) { ctx.fillStyle = "#f1c40f"; ctx.fillText("BOOM! NUKED!", canvas.width / 2, canvas.height / 2); }
+                    else { ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2); }
+                    ctx.font = "20px Arial"; ctx.fillText("Tryk Mellemrum for at prøve igen", canvas.width / 2, canvas.height / 2 + 50);
+                    ctx.textAlign = "center";
+                }, 100); return; }
+                ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white"; ctx.font = "bold 40px Arial"; ctx.textAlign = "center"; ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+                ctx.font = "20px Arial"; ctx.fillText("Tryk Mellemrum for at prøve igen", canvas.width / 2, canvas.height / 2 + 50);
+                ctx.textAlign = "center"; return;
             }
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            update();
-            drawPlayer();
-            drawObstacles();
-            drawScore();
-
-            requestAnimationFrame(animate);
+            update(); draw(); requestAnimationFrame(animate);
         }
-
         animate();
     </script>
 </body>
