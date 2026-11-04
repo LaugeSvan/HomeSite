@@ -27,12 +27,12 @@
         canvas.height = 400;
 
         // --- KONFIGURATION ---
-        const HITBOX_BUFFER = 12; // Gør hitboxes mindre (lettere spil)
-        const DEBUG_MODE = true;  // Vis de røde hitboxes
+        const HITBOX_BUFFER = 12; 
+        const DEBUG_MODE = true;  
 
         // Spil variabler
         let score = 0;
-        let scoreOffset = 0; // <--- NY: Bruges til at resette farten
+        let scoreOffset = 0; 
         let gameActive = true;
         let isPaused = false;
         let gameMode = 'normal'; 
@@ -44,6 +44,9 @@
         let nuke = { x: 0, y: -100, size: 60, speed: 6 };
         let shakeIntensity = 0;
         let flashOpacity = 0;
+        
+        // NY: Buffer til at gemme tastetryk til cheat-koden
+        let cheatBuffer = "";
 
         const player = {
             x: 100, y: 350, size: 30, color: "#3498db",
@@ -51,6 +54,26 @@
         };
 
         window.addEventListener("keydown", (e) => {
+            // --- CHEAT KODE LOGIK ---
+            // Hvis brugeren trykker på et tal, tilføj det til bufferen
+            if (e.key >= '0' && e.key <= '9') {
+                cheatBuffer += e.key;
+                // Hvis bufferen bliver "150", aktiver nuken
+                if (cheatBuffer === "150") {
+                    score = 150;
+                    checkEvolution(); // Trigger nuke logikken
+                    cheatBuffer = ""; // Nulstil buffer efter brug
+                }
+                // Hold bufferen kort så den ikke vokser uendeligt
+                if (cheatBuffer.length > 3) cheatBuffer = cheatBuffer.substring(1);
+            } else {
+                // Hvis der trykkes på andet end tal, nulstil bufferen (valgfrit)
+                if (e.code !== "Space" && e.code !== "KeyC") {
+                    cheatBuffer = "";
+                }
+            }
+
+            // Standard kontroller
             if (e.code === "KeyC") { isPaused = !isPaused; return; }
             if (isPaused) return;
             if (e.code === "Space") {
@@ -62,8 +85,6 @@
         });
 
         function spawnObstacle() {
-            // Vi beregner farten baseret på (score - scoreOffset)
-            // Det betyder at farten starter forfra, når vi skifter mode!
             const relativeScore = score - scoreOffset;
 
             if (gameMode === 'normal') {
@@ -95,7 +116,7 @@
         function checkEvolution() {
             if (score >= 75 && gameMode === 'normal') {
                 gameMode = 'flappy';
-                scoreOffset = score; // <--- NY: Vi gemmer scoren her, så farten starter fra 0 i næste beregning
+                scoreOffset = score; 
                 obstacles = [];
                 player.gravity = 0.4;
                 player.y = 200;
@@ -114,7 +135,7 @@
 
         function resetGame() {
             score = 0; 
-            scoreOffset = 0; // <--- NY: Reset offset
+            scoreOffset = 0; 
             obstacles = []; 
             obstacleTimer = 0; 
             player.y = 350; 
@@ -128,6 +149,7 @@
             graceTimer = 0; 
             shakeIntensity = 0; 
             flashOpacity = 0;
+            cheatBuffer = ""; // Nulstil cheat buffer ved reset
             statusText.innerText = "Hop over trekanterne!"; 
             statusText.style.color = "white";
             animate();
