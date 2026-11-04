@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Hop over trekanterne!</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #ffffff;
+            border: 2px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .instruktioner {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="instruktioner">
+        <h1>Hop over trekanterne!</h1>
+        <p>Tryk på <strong>Mellemrum</strong> for at hoppe.</p>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Indstillinger for spillet
+        canvas.width = 800;
+        canvas.height = 400;
+
+        let score = 0;
+        let gameActive = true;
+
+        // Spiller (Firkanten)
+        const player = {
+            x: 50,
+            y: 350,
+            size: 40,
+            color: "#3498db",
+            dy: 0,
+            jumpForce: 12,
+            gravity: 0.6,
+            grounded: false
+        };
+
+        // Forhindringer (Trekanterne)
+        const obstacles = [];
+        let obstacleTimer = 0;
+
+        // Lyt efter tastetryk
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space") {
+                if (player.grounded && gameActive) {
+                    player.dy = -player.jumpForce;
+                    player.grounded = false;
+                }
+                // Start spillet igen hvis man er tabt
+                if (!gameActive) {
+                    resetGame();
+                }
+            }
+        });
+
+        function spawnObstacle() {
+            const size = 40;
+            obstacles.push({
+                x: canvas.width,
+                y: canvas.height - size,
+                width: size,
+                height: size,
+                speed: 5 + (score / 5) // Spillet bliver hurtigere over tid
+            });
+        }
+
+        function resetGame() {
+            score = 0;
+            obstacles.length = 0;
+            player.y = 350;
+            player.dy = 0;
+            gameActive = true;
+            animate();
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = "#e74c3c";
+            obstacles.forEach(obs => {
+                ctx.beginPath();
+                ctx.moveTo(obs.x, obs.y + obs.height); // Nederste venstre
+                ctx.lineTo(obs.x + obs.width / 2, obs.y); // Top midt
+                ctx.lineTo(obs.x + obs.width, obs.y + obs.height); // Nederste højre
+                ctx.fill();
+            });
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            // Tyngdekraft og bevægelse
+            player.dy += player.gravity;
+            player.y += player.dy;
+
+            // Kollision med gulvet
+            if (player.y + player.size > canvas.height) {
+                player.y = canvas.height - player.size;
+                player.dy = 0;
+                player.grounded = true;
+            }
+
+            // Håndtering af forhindringer
+            obstacleTimer++;
+            if (obstacleTimer > Math.max(60, 100 - score)) { 
+                spawnObstacle();
+                obstacleTimer = 0;
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= obstacles[i].speed;
+
+                // Tjek for kollision (simpel firkant-kollision til trekanten)
+                if (
+                    player.x < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.size > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.size > obstacles[i].y
+                ) {
+                    gameActive = false;
+                }
+
+                // Fjern forhindringer der er gået ud af skærmen og giv point
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                    score++;
+                }
+            }
+        }
+
+        function drawScore() {
+            ctx.fillStyle = "#333";
+            ctx.font = "24px Arial";
+            ctx.fillText("Score: " + score, 20, 40);
+        }
+
+        function animate() {
+            if (!gameActive) {
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white";
+                ctx.font = "40px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+                ctx.font = "20px Arial";
+                ctx.fillText("Tryk Mellemrum for at prøve igen", canvas.width / 2, canvas.height / 2 + 40);
+                ctx.textAlign = "start";
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            update();
+            drawPlayer();
+            drawObstacles();
+            drawScore();
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
